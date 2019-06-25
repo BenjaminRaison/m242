@@ -6,12 +6,12 @@
 void setup() {
   Timer1.initialize();
   MFS.initialize(&Timer1);
-  //writeLongText("Calculator 1.0");
+  writeLongText("Calculator 1.0");
 }
 
 int firstNumber = 0;
 int secondNumber = 0;
-double result = 0;
+int result = 0;
 
 // 0 = +
 // 1 = -
@@ -91,50 +91,52 @@ void handleButtonPress() {
     byte buttonNumber = btn & B00111111;
     byte buttonAction = btn & B11000000;
 
-    if(buttonNumber == 1 && buttonAction == BUTTON_PRESSED_IND) {
-      switch(state) {
-        case 0:
-          firstNumber++;
-          break;
-        case 1:
-          if (++op > 3) {
-            op = 0;
-          }
-          break;
-        case 2:
-          secondNumber++;
-          break;
+    if(buttonAction == BUTTON_PRESSED_IND) {
+      beep();
+      if(buttonNumber == 1) {
+        switch(state) {
+          case 0:
+            firstNumber++;
+            break;
+          case 1:
+            if (++op > 3) {
+              op = 0;
+            }
+            break;
+          case 2:
+            secondNumber++;
+            break;
+        }
+      } else if(buttonNumber == 2) {
+        switch(state) {
+          case 0:
+            firstNumber--;
+            break;
+          case 2:
+            secondNumber--;
+            break;
+        }
+      } else if(buttonNumber == 3) {
+        if(++state > 3) {
+          state = 0;
+          firstNumber = 0;
+          secondNumber = 0;
+          result = 0;
+          op = 0;
+        }
       }
-    } else if(buttonNumber == 2 && buttonAction == BUTTON_PRESSED_IND) {
-      switch(state) {
-        case 0:
-          firstNumber--;
-          break;
-        case 1:
-          if (-- op < 0) {
-            op = 3;
-          }
-          break;
-        case 2:
-          secondNumber--;
-          break;
-      }
-    } else if(buttonNumber == 3 && buttonAction == BUTTON_PRESSED_IND) {
-      if(++state > 3) {
-        state = 0;
-        firstNumber = 0;
-        secondNumber = 0;
-        result = 0;
-        op = 0;
-      }
-    } 
-    
+    }
   }
 }
+
 
 ////////////////////
 // Util functions //
 ////////////////////
+
+void beep() {
+  MFS.beep(1, 5, 1, 1, 50);
+}
 
 void writeNumber(int value) {
   MFS.write(value);
